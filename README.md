@@ -20,13 +20,18 @@ here are some things you can do with the sections:
 ## syntax
 
 ```
-// reverse-osmosis:sort{human-numeric-sort: true}
+// reverse-osmosis:sort{unique: true}
 a
 b
 c
 // reverse-osmosis:end
 
 <!-- reverse-osmosis:filter{executable: nixfmt} -->
+{ pkgs ? import <nixpkgs> {} }:
+pkgs.mkShell {
+    # ...
+}
+<!-- reverse-osmosis:end -->
 ```
 
 - Punctuation `reverse-osmosis:` Filter [ FilterArgs ] [ Punctuation ]
