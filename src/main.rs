@@ -14,15 +14,19 @@ fn main() -> eyre::Result<()> {
                 if let Some(err) = entry.error() {
                     tracing::error!("{err}");
                 }
+                let path = entry.path();
                 let metadata = match entry.metadata() {
                     Ok(metadata) => metadata,
                     Err(err) => {
-                        tracing::error!("Failed to access metadata for {:?}: {err}", entry.path());
+                        tracing::error!("Failed to access metadata for {path:?}: {err}");
                         continue;
                     }
                 };
-                if !metadata.is_dir() {
-                    do_file(entry.path())?;
+                if metadata.is_dir() {
+                    tracing::trace!(?path, "Directory");
+                } else {
+                    tracing::debug!(?path, "Processing file");
+                    do_file(path)?;
                 }
             }
             Err(err) => {
