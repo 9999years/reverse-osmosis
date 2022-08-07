@@ -1,5 +1,6 @@
 use std::path::Path;
 
+use eyre::Context;
 use ignore::WalkBuilder;
 use structopt::StructOpt;
 
@@ -26,7 +27,13 @@ fn main() -> eyre::Result<()> {
                     tracing::trace!(?path, "Directory");
                 } else {
                     tracing::debug!(?path, "Processing file");
-                    do_file(path)?;
+                    match do_file(path) {
+                        Ok(()) => {}
+                        err @ Err(_) => {
+                            let err = err.wrap_err(format!("Failed to process {path:?}"));
+                            tracing::error!("{err:?}");
+                        }
+                    };
                 }
             }
             Err(err) => {
@@ -39,6 +46,13 @@ fn main() -> eyre::Result<()> {
 }
 
 fn do_file(path: &Path) -> eyre::Result<()> {
+    let original =
+        std::fs::read_to_string(path).wrap_err_with(|| format!("Failed to read {path:?}"))?;
+
+    for line in original.lines() {
+        // todo
+    }
+
     Ok(())
 }
 
